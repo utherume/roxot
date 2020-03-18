@@ -120,7 +120,26 @@ class MatchBuilder
                         }
                     }
                     break;
-
+                case 'yellowCard':
+                    $team = $this->getTeamByName($match, $details['team']);
+                    $players = $team->getPlayers();
+                    foreach ($players as $player) {
+                        if ($player->getNumber() === $details['playerNumber']) {
+                            $player->addYellowCard();
+                            break;
+                        }
+                    }
+                    break;
+                case 'redCard':
+                    $team = $this->getTeamByName($match, $details['team']);
+                    $players = $team->getPlayers();
+                    foreach ($players as $player) {
+                        if ($player->getNumber() === $details['playerNumber']) {
+                            $player->addRedCard();
+                            break;
+                        }
+                    }
+                    break;
             }
 
             $match->addMessage(

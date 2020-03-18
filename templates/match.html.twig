@@ -126,6 +126,11 @@
                             {% if player.goals > 0 %}
                                 <img src="https://www.soccer.ru/sites/all/themes/newtheme/images/events-icons/goal.png">
                             {% endif %}
+                            {% if player.redCards > 0 %}
+                                <img src="https://www.soccer.ru/sites/all/themes/newtheme/images/events-icons/yellow_red.png">
+                            {% elseif player.yellowCards > 0 %}
+                                <img src="https://www.soccer.ru/sites/all/themes/newtheme/images/events-icons/card.png">
+                            {% endif %}
                         </td>
                         <td>
                             {{ player.playTime }}’
