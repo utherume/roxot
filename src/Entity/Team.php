@@ -11,17 +11,23 @@ class Team
      * @var Player[]
      */
     private array $players;
+    /**
+     * @var Position[]
+     */
+    private array $positions;
     private string $coach;
     private int $goals;
 
-    public function __construct(string $name, string $country, string $logo, array $players, string $coach)
+    public function __construct(string $name, string $country, string $logo, array $players, array $positions, string $coach)
     {
         $this->assertCorrectPlayers($players);
 
+        $this->assertCorrectPlayers($players);
         $this->name = $name;
         $this->country = $country;
         $this->logo = $logo;
         $this->players = $players;
+        $this->positions = $positions;
         $this->coach = $coach;
         $this->goals = 0;
     }
@@ -54,6 +60,20 @@ class Team
     public function getPlayers(): array
     {
         return $this->players;
+    }
+
+    public function getPositions(): array
+    {
+        return $this->positions;
+    }
+
+    public function getPosition($name): Position
+    {
+        foreach ($this->positions as $position) {
+            if ($position->getName() === $name) {
+                return $position;
+            }
+        }
     }
 
     public function getPlayer(int $number): Player

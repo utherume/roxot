@@ -6,6 +6,7 @@ use App\Entity\Match;
 use App\Entity\Player;
 use App\Entity\Stadium;
 use App\Entity\Team;
+use App\Entity\Position;
 
 class MatchBuilder
 {
@@ -72,11 +73,25 @@ class MatchBuilder
     {
         $teamInfo = $event['details']["team$teamNumber"];
         $players = [];
+        $positionNames = [];
+        $positions = [];
         foreach ($teamInfo['players'] as $playerInfo) {
-            $players[] = new Player($playerInfo['number'], $playerInfo['name']);
+            $players[] = new Player($playerInfo['number'], $playerInfo['name'], $playerInfo['position']);
+            $positionNames[] = $playerInfo['position'];
         }
 
-        return new Team($teamInfo['title'], $teamInfo['country'], $teamInfo['logo'], $players, $teamInfo['coach']);
+        $positionNames = array_unique($positionNames);
+        foreach ($positionNames as $positionName) {
+            $positionPlayers = [];
+            foreach ($players as $player) {
+                if ($player->getPosition() === $positionName) {
+                    $positionPlayers[] = $player;
+                }
+            }
+            $positions[] = new Position($positionName, $positionPlayers);
+        }
+
+        return new Team($teamInfo['title'], $teamInfo['country'], $teamInfo['logo'], $players, $positions, $teamInfo['coach']);
     }
 
     private function processLogs(Match $match, array $logs): void
@@ -107,8 +122,12 @@ class MatchBuilder
                     break;
                 case 'replacePlayer':
                     $team = $this->getTeamByName($match, $details['team']);
+                    $positionName = $team->getPlayer($details['inPlayerNumber'])->getPosition();
+                    $team->getPosition($positionName)->goToPlay($minute);
                     $team->getPlayer($details['inPlayerNumber'])->goToPlay($minute);
                     $team->getPlayer($details['outPlayerNumber'])->goToBench($minute);
+                    $positionName = $team->getPlayer($details['outPlayerNumber'])->getPosition();
+                    $team->getPosition($positionName)->goToBench($minute);
                     break;
                 case 'goal':
                     $team = $this->getTeamByName($match, $details['team']);
@@ -180,6 +199,8 @@ class MatchBuilder
     private function goToPlay(Team $team, array $players, int $minute): void
     {
         foreach ($players as $number) {
+            $positionName = $team->getPlayer($number)->getPosition();
+            $team->getPosition($positionName)->goToPlay($minute);
             $team->getPlayer($number)->goToPlay($minute);
         }
     }
@@ -188,6 +209,8 @@ class MatchBuilder
     {
         foreach ($team->getPlayersOnField() as $player) {
             $player->goToBench($minute);
+            $positionName = $player->getPosition();
+            $team->getPosition($positionName)->goToBench($minute);
         }
     }
 
