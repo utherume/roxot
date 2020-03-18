@@ -112,7 +112,13 @@ class MatchBuilder
                     break;
                 case 'goal':
                     $team = $this->getTeamByName($match, $details['team']);
-                    $team->addGoal();
+                    $players = $team->getPlayers();
+                    foreach ($players as $player) {
+                        if ($player->getNumber() === $details['playerNumber']) {
+                            $player->addGoal();
+                            break;
+                        }
+                    }
                     break;
 
             }
